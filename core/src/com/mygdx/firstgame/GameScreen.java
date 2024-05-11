@@ -17,6 +17,7 @@ import com.badlogic.gdx.utils.ScreenUtils;
 import com.badlogic.gdx.utils.TimeUtils;
 
 public class GameScreen implements Screen {
+
     final Drop game;
     Texture dropImage;
     Texture bucketImage;
@@ -27,6 +28,7 @@ public class GameScreen implements Screen {
     Array<Rectangle> raindrops;
     long lastDropTime;
     int dropsGathered;
+    int dropsFallen;
 
     public GameScreen(final Drop game) {
         this.game = game;
@@ -59,6 +61,7 @@ public class GameScreen implements Screen {
     }
 
     private void spawnRaindrop() {
+        System.out.println("Spawning Raindrop");
         Rectangle raindrop = new Rectangle();
         raindrop.x = MathUtils.random(0, 800 - 64);
         raindrop.y = 480;
@@ -87,6 +90,7 @@ public class GameScreen implements Screen {
         // all drops
         game.batch.begin();
         game.font.draw(game.batch, "Drops Collected: " + dropsGathered, 0, 480);
+        game.font.draw(game.batch, "Drop Fallen: " + dropsFallen, 0, 460);
         game.batch.draw(bucketImage, bucket.x, bucket.y, bucket.width, bucket.height);
         for (Rectangle raindrop : raindrops) {
             game.batch.draw(dropImage, raindrop.x, raindrop.y);
@@ -122,8 +126,10 @@ public class GameScreen implements Screen {
         while (iter.hasNext()) {
             Rectangle raindrop = iter.next();
             raindrop.y -= 200 * Gdx.graphics.getDeltaTime();
-            if (raindrop.y + 64 < 0)
+            if (raindrop.y + 64 < 0) {
+                dropsFallen++;
                 iter.remove();
+            }
             if (raindrop.overlaps(bucket)) {
                 dropsGathered++;
                 dropSound.play();
