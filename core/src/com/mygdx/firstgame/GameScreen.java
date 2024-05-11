@@ -27,6 +27,7 @@ public class GameScreen implements Screen {
     Rectangle bucket;
     Array<Rectangle> raindrops;
     long lastDropTime;
+    long savedDropTime;
     int dropsGathered;
     int dropsFallen;
 
@@ -61,7 +62,7 @@ public class GameScreen implements Screen {
     }
 
     private void spawnRaindrop() {
-        System.out.println("Spawning Raindrop");
+        Gdx.app.log("INFO", "Spawned Raindrop");
         Rectangle raindrop = new Rectangle();
         raindrop.x = MathUtils.random(0, 800 - 64);
         raindrop.y = 480;
@@ -108,6 +109,10 @@ public class GameScreen implements Screen {
             bucket.x -= 200 * Gdx.graphics.getDeltaTime();
         if (Gdx.input.isKeyPressed(Keys.RIGHT))
             bucket.x += 200 * Gdx.graphics.getDeltaTime();
+        if (Gdx.input.isKeyPressed(Keys.P)) {
+            Gdx.app.log("Info", "P pressed");
+            game.setScreen(new PauseScreen(game, this));
+        }
 
         // make sure the bucket stays within the screen bounds
         if (bucket.x < 0)
@@ -155,10 +160,14 @@ public class GameScreen implements Screen {
 
     @Override
     public void pause() {
+        rainMusic.pause();
+        savedDropTime = TimeUtils.nanoTime() - lastDropTime;
     }
 
     @Override
     public void resume() {
+        lastDropTime = TimeUtils.nanoTime() - savedDropTime;
+        rainMusic.play();
     }
 
     @Override
